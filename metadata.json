@@ -1,0 +1,6 @@
+{
+  "name": "BMIS Baluarte - Smart Governance",
+  "description": "Comprehensive 4-department management system for Barangay Baluarte featuring Admin, Justice, Health, and Youth/DRRM portals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["Multi-department Workflow", "Social Welfare Tracking", "Disaster Preparedness", "Legal Management"]
+}

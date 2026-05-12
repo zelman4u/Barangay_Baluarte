@@ -1,0 +1,174 @@
+{
+  "entities": {
+    "Resident": {
+      "title": "Resident Information",
+      "description": "Comprehensive profile for community members",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "birthDate": { "type": "string", "format": "date" },
+        "gender": { "type": "string", "enum": ["Male", "Female", "Other"] },
+        "civilStatus": { "type": "string", "enum": ["Single", "Married", "Widowed", "Separated"] },
+        "purok": { "type": "string" },
+        "householdId": { "type": "string" },
+        "contactNumber": { "type": "string" },
+        "email": { "type": "string" },
+        "isVerified": { "type": "boolean" },
+        "voterStatus": { "type": "boolean" },
+        "bloodType": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "birthDate", "purok"]
+    },
+    "Household": {
+      "title": "Household Profile",
+      "description": "Grouping of residents by residence",
+      "type": "object",
+      "properties": {
+        "householdHeadId": { "type": "string" },
+        "address": { "type": "string" },
+        "purok": { "type": "string" },
+        "memberIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "Case": {
+      "title": "Katarungang Pambarangay Case",
+      "description": "Legal mediation and dispute records",
+      "type": "object",
+      "properties": {
+        "caseNumber": { "type": "string" },
+        "complainantId": { "type": "string" },
+        "respondentId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["Filed", "Mediation", "Conciliation", "Resolved", "Certified to Court"] },
+        "hearingDate": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Incident": {
+      "title": "Security Incident Report",
+      "description": "Peace and order incident logs",
+      "type": "object",
+      "properties": {
+        "reporterId": { "type": "string" },
+        "type": { "type": "string" },
+        "location": { "type": "string" },
+        "description": { "type": "string" },
+        "severity": { "type": "string", "enum": ["Low", "Medium", "High", "Critical"] },
+        "status": { "type": "string", "enum": ["Reported", "Responding", "Resolved", "False Alarm"] }
+      }
+    },
+    "Ordinance": {
+      "title": "Barangay Ordinance/Resolution",
+      "description": "Legislation and local laws",
+      "type": "object",
+      "properties": {
+        "docNumber": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "authorId": { "type": "string" },
+        "status": { "type": "string", "enum": ["Draft", "First Reading", "Second Reading", "Approved", "Repealed"] },
+        "type": { "type": "string", "enum": ["Ordinance", "Resolution"] }
+      }
+    },
+    "Transaction": {
+      "title": "Financial Transaction",
+      "description": "Revenue and expense logs",
+      "type": "object",
+      "properties": {
+        "residentId": { "type": "string" },
+        "purpose": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["Income", "Expense"] },
+        "receiptNumber": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "HealthRecord": {
+      "title": "Health & Social Welfare Record",
+      "description": "Resident health monitoring",
+      "type": "object",
+      "properties": {
+        "residentId": { "type": "string" },
+        "conditions": { "type": "array", "items": { "type": "string" } },
+        "vaccinations": { "type": "array" },
+        "lastCheckup": { "type": "string", "format": "date" }
+      }
+    },
+    "SKProject": {
+      "title": "SK Initiative",
+      "description": "Youth council projects and budget",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "budget": { "type": "number" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "residents": {
+      "schema": "Resident",
+      "description": "Master list of all residents in Barangay Baluarte"
+    },
+    "households": {
+      "schema": "Household",
+      "description": "Household groupings and addresses"
+    },
+    "cases": {
+      "schema": "Case",
+      "description": "Dispute mediation records for Lupon Tagapamayapa"
+    },
+    "incidents": {
+      "schema": "Incident",
+      "description": "Peace and Order (BPSO) incident logs"
+    },
+    "sk_projects": {
+      "schema": "SKProject",
+      "description": "Youth development initiatives and projects"
+    },
+    "patrol_schedules": {
+      "schema": { "type": "object", "properties": { "teamId": { "type": "string" }, "route": { "type": "string" }, "time": { "type": "string" } } },
+      "description": "BPSO security patrol scheduling"
+    },
+    "legislative": {
+      "schema": "Ordinance",
+      "description": "Sangguniang Barangay ordinances and resolutions"
+    },
+    "treasury": {
+      "schema": "Transaction",
+      "description": "Revenue collection and budget logs"
+    },
+    "health": {
+      "schema": "HealthRecord",
+      "description": "Medical and social welfare monitoring"
+    },
+    "document_requests": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "userName": { "type": "string" },
+          "documentType": { "type": "string" },
+          "purpose": { "type": "string" },
+          "status": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "description": "Resident document certificate requests"
+    },
+    "staff": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "department": { "type": "string" },
+          "role": { "type": "string" }
+        }
+      },
+      "description": "Barangay personnel records and permissions"
+    }
+  }
+}

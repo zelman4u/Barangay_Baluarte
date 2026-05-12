@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net - Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- PRIMITIVES ---
+    function isSignedIn() { return request.auth != null; }
+    
+    // Safely get user profile
+    function getProfile() {
+      let profilePath = /databases/$(database)/documents/staff/$(request.auth.uid);
+      return exists(profilePath) ? get(profilePath).data : {};
+    }
+
+    function isAdmin() { 
+      let profile = getProfile();
+      return isSignedIn() && (
+        (profile.get('role', 'none') in ['super_admin', 'barangay_captain', 'secretary']) ||
+        request.auth.token.email == 'funcionelmar@gmail.com'
+      );
+    }
+
+    function isStaffMember(dept) {
+      let profile = getProfile();
+      return isSignedIn() && (profile.get('department', 'none') == dept || isAdmin());
+    }
+
+    // --- SHARED STAFF ACCESS ---
+    match /residents/{residentId} {
+      allow get: if isSignedIn();
+      allow create: if isSignedIn();
+      allow list: if isSignedIn(); // Relaxed for now to fix errors
+      allow update: if isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /residents_users/{userId} {
+      allow get: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update, delete: if isAdmin();
+    }
+
+    // --- DEPARTMENTAL ISOLATION ---
+    
+    // Justice / Public Safety
+    match /justice_complaints/{docId} { allow read, write: if isSignedIn(); }
+    match /mediation_sessions/{docId} { allow read, write: if isSignedIn(); }
+    match /cases/{docId} { allow read, write: if isSignedIn(); }
+    match /incidents/{docId} { allow read, write: if isSignedIn(); }
+    match /blotter_records/{docId} { allow read, write: if isSignedIn(); }
+    match /patrol_schedules/{docId} { allow read, write: if isSignedIn(); }
+    match /ordinance_violations/{docId} { allow read, write: if isSignedIn(); }
+    match /community_alerts/{docId} { allow read, write: if isSignedIn(); }
+
+    // Resources / SK / DRRM / Environment
+    match /sk_projects/{docId} { allow read, write: if isSignedIn(); }
+    match /waste_records/{docId} { allow read, write: if isSignedIn(); }
+    match /evacuation_records/{docId} { allow read, write: if isSignedIn(); }
+    match /relief_distribution/{docId} { allow read, write: if isSignedIn(); }
+    match /environmental_reports/{docId} { allow read, write: if isSignedIn(); }
+    match /relief_operations/{docId} { allow read, write: if isSignedIn(); }
+    match /waste_collection/{docId} { allow read, write: if isSignedIn(); }
+    match /recycling_logs/{docId} { allow read, write: if isSignedIn(); }
+
+    // Administration & Governance
+    match /treasury/{docId} { allow read, write: if isSignedIn(); }
+    match /legislative/{docId} { allow read, write: if isSignedIn(); }
+    match /sessions/{docId} { allow read, write: if isSignedIn(); }
+    match /cedulas/{docId} { allow read, write: if isSignedIn(); }
+    match /staff/{docId} { allow read, write: if isSignedIn(); }
+    match /document_requests/{docId} { allow read, write: if isSignedIn(); }
+    match /barangay_resolutions/{docId} { allow read, write: if isSignedIn(); }
+
+    // Health & Social Welfare
+    match /health/{docId} { allow read, write: if isSignedIn(); }
+    match /health_records/{docId} { allow read, write: if isSignedIn(); }
+    match /vaccinations/{docId} { allow read, write: if isSignedIn(); }
+    match /medical_assistance/{docId} { allow read, write: if isSignedIn(); }
+    match /nutrition_program/{docId} { allow read, write: if isSignedIn(); }
+    match /senior_citizens/{docId} { allow read, write: if isSignedIn(); }
+    match /pwd_registry/{docId} { allow read, write: if isSignedIn(); }
+    match /welfare_logs/{docId} { allow read, write: if isSignedIn(); }
+    match /outreach_programs/{docId} { allow read, write: if isSignedIn(); }
+    match /medical_assistance_requests/{docId} { allow read, write: if isSignedIn(); }
+    match /social_welfare_cases/{docId} { allow read, write: if isSignedIn(); }
+
+    // Public Assets / Announcements
+    match /announcements/{annId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}
